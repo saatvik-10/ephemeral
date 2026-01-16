@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateUsername } from "../../lib/generate-username";
-import { USER_CHAT_KEY } from "../../constants/username";
+import { generateUsername } from "../lib/generate-username";
+import { USER_CHAT_KEY } from "../constants/username";
 import { useMutation } from "@tanstack/react-query";
-import { client } from "../../lib/client";
+import { client } from "../lib/client";
 import { useRouter } from "next/navigation";
 
 export default function Home() {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { cn, formatTimeRemaining } from "../../../../lib/utils";
+import { cn, formatTimeRemaining } from "../../../lib/utils";
 
 const Page = () => {
   const params = useParams();

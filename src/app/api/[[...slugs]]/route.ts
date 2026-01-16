@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { nanoid } from "nanoid";
-import { redis } from "../../../../lib/redis";
+import { redis } from "../../../lib/redis";
 
 const rooms = new Elysia({ prefix: "/room" }).post("/create", async () => {
   const roomId = nanoid();
