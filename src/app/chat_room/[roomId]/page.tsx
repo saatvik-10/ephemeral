@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { cn, formatTimeRemaining } from "../../../lib/utils";
+import ChatComponent from "@/components/ChatComponent";
 
 const Page = () => {
   const params = useParams();
@@ -23,7 +24,7 @@ const Page = () => {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <div className="flex h-screen max-h-screen w-7xl flex-col overflow-hidden p-4">
-        <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/30 p-4 shadow-xs shadow-white">
+        <div className="flex items-center justify-between rounded-lg border-b border-zinc-800 bg-zinc-900/30 p-4 shadow-xs shadow-white">
           <div className="flex items-center justify-center">
             <div className="flex flex-col">
               <span className="text-x text-zinc-500 uppercase">Room ID</span>
@@ -68,6 +69,8 @@ const Page = () => {
             NUKE NOW
           </button>
         </div>
+
+        <ChatComponent />
       </div>
     </main>
   );
