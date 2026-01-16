@@ -3,9 +3,14 @@
 import { useEffect, useState } from "react";
 import { generateUsername } from "../../lib/generate-username";
 import { USER_CHAT_KEY } from "../../constants/username";
+import { useMutation } from "@tanstack/react-query";
+import { client } from "../../lib/client";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [username, setUsername] = useState<string>("");
+
+  const route = useRouter();
 
   useEffect(() => {
     const initializeUsername = () => {
@@ -23,6 +28,20 @@ export default function Home() {
 
     initializeUsername();
   }, []);
+
+  const { mutate: createRoom } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await client.room.create.post();
+  
+        if (res.status === 200) {
+          route.push(`/chat_room/${res.data?.roomId}`);
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+  });
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
@@ -49,7 +68,10 @@ export default function Home() {
               </div>
             </div>
 
-            <button className="mt-2 w-full cursor-pointer rounded-md bg-zinc-100 p-3 text-black transition-colors hover:bg-zinc-50 hover:not-only:text-black disabled:opacity-50">
+            <button
+              onClick={() => createRoom()}
+              className="mt-2 w-full cursor-pointer rounded-md bg-zinc-100 p-3 text-black transition-colors hover:bg-zinc-50 hover:not-only:text-black disabled:opacity-50"
+            >
               LAUNCH ROOM
             </button>
           </div>
