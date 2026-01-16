@@ -29,17 +29,17 @@ export default function Home() {
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-blue-500">
-            &copy;private_chat_room
+            &copy;ephemeral_conversations
           </h1>
-          <p className="text-sm text-zinc-500">
-            A private, self-destructing chat room...
+          <p className="text-sm text-red-500">
+            End-to-end encrypted chats that self-destruct...
           </p>
         </div>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-md">
           <div className="space-y-2">
             <div className="space-y-2">
               <label className="flex items-center text-zinc-500">
-                Your Identity
+                Chat Handle
               </label>
 
               <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ export default function Home() {
             </div>
 
             <button className="mt-2 w-full cursor-pointer rounded-md bg-zinc-100 p-3 text-black transition-colors hover:bg-zinc-50 hover:not-only:text-black disabled:opacity-50">
-              CREATE ROOM
+              LAUNCH ROOM
             </button>
           </div>
         </div>
