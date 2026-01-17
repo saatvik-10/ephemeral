@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { cn, formatTimeRemaining } from "../../../lib/utils";
 import ChatComponent from "@/components/ChatComponent";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { client } from "@/lib/client";
 import { useUsername } from "@/hooks/useUsername";
+import { Message } from "@/lib/realtime";
 
 const Page = () => {
   const params = useParams();
@@ -16,6 +17,17 @@ const Page = () => {
 
   const [copyStatus, setCopyStatus] = useState<string>("COPY");
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+
+  const { data: msgs = [] } = useQuery<Message[]>({
+    queryKey: ["msgs", roomId],
+    queryFn: async () => {
+      const res = await client.msgs.get({
+        query: { roomId },
+      });
+
+      return (res.data?.msgs as []) || [];
+    },
+  });
 
   const { mutate: sendMsg, isPending } = useMutation({
     mutationFn: async ({ text }: { text: string }) => {
@@ -91,7 +103,7 @@ const Page = () => {
           </button>
         </div>
 
-        <ChatComponent isPending={isPending} sendMsg={sendMsg} />
+        <ChatComponent isPending={isPending} sendMsg={sendMsg} msgs={msgs} />
       </div>
     </main>
   );
