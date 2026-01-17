@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import * as z from "zod";
 
 export const chatSchema = z.object({
   id: z.string(),
@@ -14,8 +14,8 @@ export const chatDestroyer = z.object({
 });
 
 export const chatValidatorSchema = {
-    chat: {
-        message: chatSchema,
-        destroy: chatDestroyer
-    }
-}
+  chat: {
+    message: chatSchema,
+    destroy: chatDestroyer,
+  },
+} as const;
