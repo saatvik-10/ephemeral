@@ -45,12 +45,12 @@ const msgs = new Elysia({ prefix: "/msgs" })
 
       await redis.rpush(`msgs: ${roomId}`, {
         ...msg,
-        token,
+        token: token,
       });
 
       await realtime.channel(roomId).emit("chat.message", msg);
 
-      const remainingTTL = await redis.ttl(`meta_rom_id: ${roomId}`);
+      const remainingTTL = await redis.ttl(`meta_room_id: ${roomId}`);
 
       await redis.expire(`msgs: ${roomId}`, remainingTTL);
       await redis.expire(`history: ${roomId}`, remainingTTL);
@@ -66,12 +66,12 @@ const msgs = new Elysia({ prefix: "/msgs" })
     async ({ auth }) => {
       const { roomId, token } = auth;
 
-      const msgs = await redis.lrange<Message[]>(`msgs: ${roomId}`, 0, -1);
+      const msgs = await redis.lrange<Message>(`msgs: ${roomId}`, 0, -1);
 
       return {
         msgs: msgs.map((msg) => ({
           ...msg,
-          token: msg[0].token === token ? token : undefined,
+          token: msg.token === token ? token : undefined,
         })),
       };
     },
