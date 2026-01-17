@@ -1,44 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { generateUsername } from "../lib/generate-username";
-import { USER_CHAT_KEY } from "../constants/username";
 import { useMutation } from "@tanstack/react-query";
 import { client } from "../lib/client";
 import { useRouter } from "next/navigation";
+import { useUsername } from "@/hooks/useUsername";
 
 export default function Home() {
-  const [username, setUsername] = useState<string>("");
-
   const route = useRouter();
 
-  useEffect(() => {
-    const initializeUsername = () => {
-      const userStored = localStorage.getItem(USER_CHAT_KEY);
-
-      if (userStored) {
-        setUsername(userStored);
-        return;
-      }
-
-      const generatedUsername = generateUsername();
-      localStorage.setItem(USER_CHAT_KEY, generatedUsername);
-      setUsername(generatedUsername);
-    };
-
-    initializeUsername();
-  }, []);
+  const { username } = useUsername();
 
   const { mutate: createRoom } = useMutation({
     mutationFn: async () => {
       try {
         const res = await client.room.create.post();
-  
+
         if (res.status === 200) {
           route.push(`/chat_room/${res.data?.roomId}`);
         }
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     },
   });
