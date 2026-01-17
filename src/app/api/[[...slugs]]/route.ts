@@ -21,44 +21,64 @@ const rooms = new Elysia({ prefix: "/room" }).post("/create", async () => {
   return { roomId };
 });
 
-const msgs = new Elysia({ prefix: "/msgs" }).use(authProxy).post(
-  "/",
-  async ({ body, auth }) => {
-    const { sender, text } = body;
-    const { roomId, token } = auth;
+const msgs = new Elysia({ prefix: "/msgs" })
+  .use(authProxy)
+  .post(
+    "/",
+    async ({ body, auth }) => {
+      const { sender, text } = body;
+      const { roomId, token } = auth;
 
-    const roomExists = await redis.exists(`meta_room_id: ${roomId}`);
+      const roomExists = await redis.exists(`meta_room_id: ${roomId}`);
 
-    if (!roomExists) {
-      throw new Error("Room does not exist");
-    }
+      if (!roomExists) {
+        throw new Error("Room does not exist");
+      }
 
-    const msg: Message = {
-      id: nanoid(),
-      sender,
-      text,
-      timestamp: Date.now(),
-      roomId,
-    };
+      const msg: Message = {
+        id: nanoid(),
+        sender,
+        text,
+        timestamp: Date.now(),
+        roomId,
+      };
 
-    await redis.rpush(`msgs: ${roomId}`, {
-      ...msg,
-      token,
-    });
+      await redis.rpush(`msgs: ${roomId}`, {
+        ...msg,
+        token,
+      });
 
-    await realtime.channel(roomId).emit("chat.message", msg);
+      await realtime.channel(roomId).emit("chat.message", msg);
 
-    const remainingTTL = await redis.ttl(`meta_rom_id: ${roomId}`);
+      const remainingTTL = await redis.ttl(`meta_rom_id: ${roomId}`);
 
-    await redis.expire(`msgs: ${roomId}`, remainingTTL);
-    await redis.expire(`history: ${roomId}`, remainingTTL);
-    await redis.expire(roomId, remainingTTL);
-  },
-  {
-    query: querySchema,
-    body: bodySchema,
-  },
-);
+      await redis.expire(`msgs: ${roomId}`, remainingTTL);
+      await redis.expire(`history: ${roomId}`, remainingTTL);
+      await redis.expire(roomId, remainingTTL);
+    },
+    {
+      query: querySchema,
+      body: bodySchema,
+    },
+  )
+  .get(
+    "/",
+    async ({ auth }) => {
+      const { roomId, token } = auth;
+
+      const msgs = await redis.lrange<Message[]>(`msgs: ${roomId}`, 0, -1);
+
+      return {
+        msgs: msgs.map((msg) => ({
+          ...msg,
+          token: msg[0].token === token ? token : undefined,
+        })),
+      };
+    },
+    {
+      query: querySchema,
+    },
+  );
 
 const app = new Elysia({ prefix: "/api" }).use(rooms).use(msgs);
 
