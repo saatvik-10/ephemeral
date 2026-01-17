@@ -40,26 +40,34 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
         )}
 
         {msgs.map((msg) => (
-          <div key={msg.id} className="flex flex-col items-start">
+          <div
+            key={msg.id}
+            className={cn(
+              "flex flex-col",
+              msg.sender === username ? "items-end" : "items-start",
+            )}
+          >
             <div className="group max-w-[80%]">
               <div className="mb-1 flex items-baseline gap-3">
                 <span
                   className={cn(
                     "text-xs font-bold",
-                    `${msg.sender === username ? "text-blue-500" : "text-green-500"}`,
+                    msg.sender === username
+                      ? "text-blue-500"
+                      : "text-green-500",
                   )}
                 >
                   {msg.sender === username ? "YOU" : msg.sender}
                 </span>
 
-                <span className="text-[10px] text-zinc-600">
+                <span className="text-[10px] text-zinc-500">
                   {format(msg.timestamp, "HH:mm")}
                 </span>
-
-                <p className="text-sm text-zinc-300 leading-relaxed break-all">
-                  {msg.text}
-                </p>
               </div>
+
+              <p className="text-sm leading-relaxed break-all text-zinc-300 md:text-lg">
+                {msg.text}
+              </p>
             </div>
           </div>
         ))}
