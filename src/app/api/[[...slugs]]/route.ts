@@ -4,22 +4,35 @@ import { redis } from "../../../lib/redis";
 import { authProxy } from "./auth";
 import { bodySchema, querySchema } from "@/validator/msg.validator";
 import { Message, realtime } from "@/lib/realtime";
+import { allowedParticipantsSchema } from "@/validator/chat.validator";
 
-const rooms = new Elysia({ prefix: "/room" }).post("/create", async () => {
-  const roomId = nanoid();
+const rooms = new Elysia({ prefix: "/room" }).post(
+  "/create",
+  async ({ body }) => {
+    const roomId = nanoid();
+    const { allowedParticipants } = body;
 
-  await redis.hset(`meta_room_id: ${roomId}`, {
-    connected: [],
-    createdAt: Date.now(),
-  });
+    if (!allowedParticipants || allowedParticipants <= 0) {
+      throw new Error("invalid-capacity");
+    }
 
-  await redis.expire(
-    `meta_room_id: ${roomId}`,
-    Number(process.env.ROOM_TTL_SECONDS),
-  );
+    await redis.hset(`meta_room_id: ${roomId}`, {
+      connected: [],
+      allowedParticipants,
+      createdAt: Date.now(),
+    });
 
-  return { roomId };
-});
+    await redis.expire(
+      `meta_room_id: ${roomId}`,
+      Number(process.env.ROOM_TTL_SECONDS),
+    );
+
+    return { roomId };
+  },
+  {
+    body: allowedParticipantsSchema,
+  },
+);
 
 const msgs = new Elysia({ prefix: "/msgs" })
   .use(authProxy)

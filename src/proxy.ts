@@ -23,12 +23,12 @@ export const proxy = async (req: NextRequest) => {
     return NextResponse.next();
   }
 
-  if (meta_room_id.connected.length >= 2) {
+  if (meta_room_id.connected.length >= meta_room_id.allowedParticipants) {
     return NextResponse.redirect(new URL("/?err=room-full", req.url));
   }
 
   const res = NextResponse.next();
-  
+
   const tk = nanoid();
 
   res.cookies.set("ephemeral-auth-token", tk, {

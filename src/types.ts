@@ -1,1 +1,5 @@
-export type ChatRoom = { connected: string[]; createdAt: number };
+export type ChatRoom = { 
+  connected: string[]; 
+  allowedParticipants: number;
+  createdAt: number;
+};
