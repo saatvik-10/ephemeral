@@ -68,7 +68,7 @@ function Page() {
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-blue-500">
-            &copy;ephemeral_conversations
+            &copy;ephemeral
           </h1>
           <p className="text-sm text-red-500">
             End-to-end encrypted chats that self-destruct...

@@ -10,7 +10,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ephemeral Conversations",
+  title: "Ephemeral",
   description: "End-to-end encrypted chats that self-destruct",
 };
 
