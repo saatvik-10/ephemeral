@@ -130,6 +130,10 @@ const msgs = new Elysia({ prefix: "/msgs" })
         redis.del(`meta_room_id: ${roomId}`),
         redis.del(`msgs: ${roomId}`),
       ]);
+
+      await realtime.channel(roomId).emit("chat.destroy", {
+        isDestoyed: true,
+      });
     },
     {
       query: querySchema,
