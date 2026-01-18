@@ -9,6 +9,7 @@ import { useRealtime } from "@/lib/realtime-client";
 import { useRouter } from "next/navigation";
 import { useRoom } from "@/hooks/useRoom";
 import { useMsg } from "@/hooks/useMsg";
+import { useRoomTimer } from "@/hooks/useRoomTimer";
 
 const Page = () => {
   const params = useParams();
@@ -17,44 +18,12 @@ const Page = () => {
   const route = useRouter();
 
   const { username } = useUsername();
+
   const { ttlData, metaData, destroyRoom } = useRoom(roomId);
   const { msgs, refetch, sendMsg, isPending } = useMsg({ roomId, username });
+  const { timeRemaining } = useRoomTimer(ttlData?.ttl);
 
   const [copyStatus, setCopyStatus] = useState<string>("COPY");
-  const [timeRemaining, setTimeRemaining] = useState<number>();
-  const [totalMembers, setTotalMembers] = useState<number>();
-
-  useEffect(() => {
-    if (ttlData?.ttl !== undefined) {
-      setTimeRemaining(ttlData.ttl);
-    }
-  }, [ttlData?.ttl]);
-
-  useEffect(() => {
-    if (metaData?.connected !== undefined) {
-      setTotalMembers(metaData.connected);
-    }
-  }, [metaData?.connected]);
-
-  useEffect(() => {
-    if (timeRemaining === undefined || timeRemaining <= 0) {
-      if (timeRemaining === 0) {
-        route.push("/?destroyed=true");
-      }
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev === undefined || prev <= 1) {
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timeRemaining, route]);
 
   useRealtime({
     channels: [roomId],
@@ -127,7 +96,7 @@ const Page = () => {
               <span className="text-xs text-zinc-500 uppercase">Allowed</span>
 
               <span className="flex items-center gap-2 text-sm font-bold">
-                {totalMembers}/{metaData?.allowedParticipants as number}
+                {metaData?.allowedParticipants as number}
               </span>
             </div>
           </div>
