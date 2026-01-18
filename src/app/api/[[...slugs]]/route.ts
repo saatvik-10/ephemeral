@@ -55,7 +55,6 @@ const rooms = new Elysia({ prefix: "/room" })
 
       return {
         allowedParticipants: roomMeta?.allowedParticipants,
-        connected: (roomMeta?.connected as string[])?.length,
       };
     },
     { query: querySchema },
