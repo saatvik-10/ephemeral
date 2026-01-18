@@ -66,7 +66,7 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
                 </span>
               </div>
 
-              <p className="text-sm leading-relaxed break-all text-zinc-300 md:text-lg">
+              <p className="text-sm leading-relaxed break-all text-zinc-300 md:text-base">
                 {msg.text}
               </p>
             </div>
