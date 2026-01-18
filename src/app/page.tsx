@@ -2,27 +2,52 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { client } from "../lib/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUsername } from "@/hooks/useUsername";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { errMessages } from "@/constants/err";
 
 export default function Home() {
   const route = useRouter();
 
+  const [allowedParticipants, setallowedParticipants] = useState<number>(0);
+
   const { username } = useUsername();
+  const searchParams = useSearchParams();
+
+  const isDestroyed = searchParams.get("destroyed") === "true";
+  const err = searchParams.get("err");
 
   const { mutate: createRoom } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await client.room.create.post();
+        const res = await client.room.create.post({
+          allowedParticipants,
+        });
 
         if (res.status === 200) {
           route.push(`/chat_room/${res.data?.roomId}`);
+          toast.success("Creating Room...Please wait!");
+        } else {
+          toast.error("Room config was invalid!");
         }
       } catch (err) {
+        toast.error("Error creating room");
         console.log(err);
       }
     },
   });
+
+  useEffect(() => {
+    if (isDestroyed) {
+      toast.error("Every word has been purged from existence!", {
+        id: "destroyed",
+      });
+    } else if (err && errMessages[err as keyof typeof errMessages]) {
+      toast.error(errMessages[err as keyof typeof errMessages], { id: err });
+    }
+  }, [isDestroyed, err]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
@@ -36,8 +61,8 @@ export default function Home() {
           </p>
         </div>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-md">
-          <div className="space-y-2">
-            <div className="space-y-2">
+          <div className="space-y-3">
+            <div className="space-y-1">
               <label className="flex items-center text-zinc-500">
                 Chat Handle
               </label>
@@ -45,6 +70,29 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <div className="flex-1 rounded-md border border-zinc-800 bg-zinc-950 p-3 font-mono text-sm text-zinc-400">
                   {username}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label
+                htmlFor="ppl_allowed"
+                className="flex items-center text-zinc-500"
+              >
+                Max Participants
+              </label>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 rounded-md border border-zinc-800 bg-zinc-950 p-3 font-mono text-sm text-zinc-400">
+                  <input
+                    value={allowedParticipants}
+                    onChange={(e) =>
+                      setallowedParticipants(e.target.valueAsNumber)
+                    }
+                    placeholder="Enter allowed participants..."
+                    type="number"
+                    className="w-full focus:outline-none"
+                  />
                 </div>
               </div>
             </div>
