@@ -10,6 +10,7 @@ import { useUsername } from "@/hooks/useUsername";
 import { Message } from "@/lib/realtime";
 import { useRealtime } from "@/lib/realtime-client";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Page = () => {
   const params = useParams();
@@ -96,6 +97,7 @@ const Page = () => {
         );
       } catch (err) {
         console.log("Error sending message", err);
+        toast.error("Error sending message");
       }
     },
   });
@@ -110,6 +112,17 @@ const Page = () => {
 
       if (event === "chat.destroy") {
         route.push("/?destroyed=true");
+      }
+    },
+  });
+
+  const { mutate: destroyRoom } = useMutation({
+    mutationFn: async () => {
+      try {
+        await client.room.delete(null, { query: { roomId } });
+      } catch (err) {
+        console.log("Error nuking room", err);
+        toast.error("Error nuking room");
       }
     },
   });
@@ -176,7 +189,10 @@ const Page = () => {
             </div>
           </div>
 
-          <button className="hover:text-whote group flex cursor-pointer items-center gap-2 rounded bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-400 transition-all hover:bg-red-600 hover:text-white disabled:opacity-50">
+          <button
+            onClick={() => destroyRoom()}
+            className="hover:text-whote group flex cursor-pointer items-center gap-2 rounded bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-400 transition-all hover:bg-red-600 hover:text-white disabled:opacity-50"
+          >
             NUKE NOW
           </button>
         </div>

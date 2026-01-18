@@ -41,7 +41,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isDestroyed) {
-      toast("Room Destroyed! All messages have been purged from existence.", {
+      toast("Room Nuked! All messages have been purged from existence.", {
         id: "destroyed",
         duration: 4000,
         style: {
