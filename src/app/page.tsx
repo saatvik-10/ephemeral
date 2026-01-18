@@ -4,11 +4,19 @@ import { useMutation } from "@tanstack/react-query";
 import { client } from "../lib/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUsername } from "@/hooks/useUsername";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { errMessages } from "@/constants/err";
 
 export default function Home() {
+  return (
+    <Suspense>
+      <Page />
+    </Suspense>
+  );
+}
+
+function Page() {
   const route = useRouter();
 
   const [allowedParticipants, setallowedParticipants] = useState<number>(0);
