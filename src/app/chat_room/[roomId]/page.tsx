@@ -4,44 +4,25 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { cn, formatTimeRemaining } from "../../../lib/utils";
 import ChatComponent from "@/components/ChatComponent";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { client } from "@/lib/client";
 import { useUsername } from "@/hooks/useUsername";
-import { Message } from "@/lib/realtime";
 import { useRealtime } from "@/lib/realtime-client";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { useRoom } from "@/hooks/useRoom";
+import { useMsg } from "@/hooks/useMsg";
 
 const Page = () => {
   const params = useParams();
   const roomId = params.roomId as string;
 
   const route = useRouter();
+
   const { username } = useUsername();
+  const { ttlData, metaData, destroyRoom } = useRoom(roomId);
+  const { msgs, refetch, sendMsg, isPending } = useMsg({ roomId, username });
 
   const [copyStatus, setCopyStatus] = useState<string>("COPY");
   const [timeRemaining, setTimeRemaining] = useState<number>();
   const [totalMembers, setTotalMembers] = useState<number>();
-
-  const { data: ttlData } = useQuery({
-    queryKey: ["ttl", roomId],
-    queryFn: async () => {
-      const res = await client.room.ttl.get({
-        query: { roomId },
-      });
-      return res.data;
-    },
-  });
-
-  const { data: metaData } = useQuery({
-    queryKey: ["meta", roomId],
-    queryFn: async () => {
-      const res = await client.room.meta.get({
-        query: { roomId },
-      });
-      return res.data;
-    },
-  });
 
   useEffect(() => {
     if (ttlData?.ttl !== undefined) {
@@ -75,33 +56,6 @@ const Page = () => {
     return () => clearInterval(interval);
   }, [timeRemaining, route]);
 
-  const { data: msgs = [], refetch } = useQuery<Message[]>({
-    queryKey: ["msgs", roomId],
-    queryFn: async () => {
-      const res = await client.msgs.get({
-        query: { roomId },
-      });
-      return (res.data?.msgs as []) || [];
-    },
-  });
-
-  const { mutate: sendMsg, isPending } = useMutation({
-    mutationFn: async ({ text }: { text: string }) => {
-      try {
-        await client.msgs.post(
-          {
-            sender: username,
-            text,
-          },
-          { query: { roomId } },
-        );
-      } catch (err) {
-        console.log("Error sending message", err);
-        toast.error("Error sending message");
-      }
-    },
-  });
-
   useRealtime({
     channels: [roomId],
     events: ["chat.message", "chat.destroy"],
@@ -112,17 +66,6 @@ const Page = () => {
 
       if (event === "chat.destroy") {
         route.push("/?destroyed=true");
-      }
-    },
-  });
-
-  const { mutate: destroyRoom } = useMutation({
-    mutationFn: async () => {
-      try {
-        await client.room.delete(null, { query: { roomId } });
-      } catch (err) {
-        console.log("Error nuking room", err);
-        toast.error("Error nuking room");
       }
     },
   });
