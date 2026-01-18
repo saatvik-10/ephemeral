@@ -8,6 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { client } from "@/lib/client";
 import { useUsername } from "@/hooks/useUsername";
 import { Message } from "@/lib/realtime";
+import { useRealtime } from "@/lib/realtime-client";
 
 const Page = () => {
   const params = useParams();
@@ -18,7 +19,7 @@ const Page = () => {
   const [copyStatus, setCopyStatus] = useState<string>("COPY");
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
 
-  const { data: msgs = [] } = useQuery<Message[]>({
+  const { data: msgs = [], refetch } = useQuery<Message[]>({
     queryKey: ["msgs", roomId],
     queryFn: async () => {
       const res = await client.msgs.get({
@@ -41,6 +42,16 @@ const Page = () => {
         );
       } catch (err) {
         console.log("Error sending message", err);
+      }
+    },
+  });
+
+  useRealtime({
+    channels: [roomId],
+    events: ["chat.message", "chat.destroy"],
+    onData: ({ event }) => {
+      if (event === "chat.message") {
+        refetch();
       }
     },
   });

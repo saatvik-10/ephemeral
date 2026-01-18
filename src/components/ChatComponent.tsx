@@ -15,6 +15,7 @@ interface ChatSubmissionProps {
 const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
   const [input, setInput] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
+  
   const { username } = useUsername();
 
   const handleChatText = () => {
