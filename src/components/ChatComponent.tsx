@@ -27,7 +27,8 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <>
+    <div className="flex flex-1 flex-col overflow-hidden border border-zinc-600 rounded-lg my-3">
       <div className="scrollbar-thin flex-1 space-y-4 overflow-y-auto p-4">
         {msgs?.length === 0 && (
           <div className="flex h-full items-center justify-center">
@@ -74,6 +75,7 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
         ))}
       </div>
 
+    </div>
       <div className="rounded-lg border-t border-zinc-800 bg-zinc-900/30 p-4">
         <div className="flex gap-4">
           <div className="group relative flex-1">
@@ -102,7 +104,7 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
           </button>
         </div>
       </div>
-    </div>
+      </>
   );
 };
 
