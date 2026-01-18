@@ -29,21 +29,19 @@ function Page() {
 
   const { mutate: createRoom } = useMutation({
     mutationFn: async () => {
-      try {
-        const res = await client.room.create.post({
-          allowedParticipants,
-        });
+      const res = await client.room.create.post({
+        allowedParticipants,
+      });
 
-        if (res.status === 200) {
-          route.push(`/chat_room/${res.data?.roomId}`);
-          toast.success("Creating Room...Please wait!");
-        } else {
-          toast.error("Room config was invalid!");
-        }
-      } catch (err) {
-        toast.error("Error creating room");
-        console.log(err);
+      if (res.status === 200) {
+        route.push(`/chat_room/${res.data?.roomId}`);
+        toast.success("Creating Room...Please wait!");
+      } else {
+        toast.error("Room config was invalid!");
       }
+    },
+    onError: () => {
+      toast.error("Error creating room");
     },
   });
 

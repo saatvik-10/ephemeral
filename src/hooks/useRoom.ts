@@ -25,12 +25,10 @@ export function useRoom(roomId: string) {
 
   const { mutate: destroyRoom } = useMutation({
     mutationFn: async () => {
-      try {
-        await client.room.delete(null, { query: { roomId } });
-      } catch (err) {
-        console.log("Error nuking room", err);
-        toast.error("Error nuking room");
-      }
+      await client.room.delete(null, { query: { roomId } });
+    },
+    onError: () => {
+      toast.error("Error nuking room");
     },
   });
 
