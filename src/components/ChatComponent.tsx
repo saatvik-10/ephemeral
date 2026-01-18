@@ -35,7 +35,7 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
   };
 
   return (
-    <main>
+    <>
       <div className="my-3 flex flex-1 flex-col overflow-hidden rounded-lg border border-zinc-600">
         <div
           ref={messageContainerRef}
@@ -114,7 +114,7 @@ const ChatComponent = ({ sendMsg, isPending, msgs }: ChatSubmissionProps) => {
           </button>
         </div>
       </div>
-    </main>
+    </>
   );
 };
 
