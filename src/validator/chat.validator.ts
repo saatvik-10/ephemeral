@@ -1,5 +1,9 @@
 import * as z from "zod";
 
+export const allowedParticipantsSchema = z.object({
+  allowedParticipants: z.number()
+})
+
 export const chatSchema = z.object({
   id: z.string(),
   sender: z.string(),
