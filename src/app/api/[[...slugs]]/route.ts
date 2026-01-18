@@ -92,9 +92,10 @@ const msgs = new Elysia({ prefix: "/msgs" })
 
       const remainingTTL = await redis.ttl(`meta_room_id: ${roomId}`);
 
-      await redis.expire(`msgs: ${roomId}`, remainingTTL);
-      await redis.expire(`history: ${roomId}`, remainingTTL);
-      await redis.expire(roomId, remainingTTL);
+      await Promise.all([
+        redis.expire(`msgs: ${roomId}`, remainingTTL),
+        redis.expire(roomId, remainingTTL),
+      ]);
     },
     {
       query: querySchema,
@@ -118,7 +119,16 @@ const msgs = new Elysia({ prefix: "/msgs" })
     {
       query: querySchema,
     },
-  );
+  )
+  .delete("/", async ({ auth }) => {
+    const { roomId } = auth;
+
+    await Promise.all([
+      redis.del(roomId),
+      redis.del(`meta_room_id: ${roomId}`),
+      redis.del(`msgs: ${roomId}`),
+    ]);
+  });
 
 const app = new Elysia({ prefix: "/api" }).use(rooms).use(msgs);
 
